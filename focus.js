@@ -18,6 +18,15 @@
 
   document.body.classList.add(FOCUS_CLASS);
 
+  // Enter fullscreen mode
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen();
+  } else if (document.documentElement.webkitRequestFullscreen) {
+    document.documentElement.webkitRequestFullscreen();
+  } else if (document.documentElement.msRequestFullscreen) {
+    document.documentElement.msRequestFullscreen();
+  }
+
   const workout = document.querySelector(".workout");
   if (!workout) {
     alert("Workout section not found!");
@@ -71,6 +80,29 @@
   console.log(`Found ${contentDivs.length} content divs:`, contentDivs);
 
   let currentIndex = 0;
+  let baseFontSize = 8; // Base font size in rem
+  let currentFontSize = baseFontSize; // Current font size in rem
+
+  // Function to update font size
+  function updateFontSize(fontSize) {
+    // Update CSS style rule dynamically instead of inline styles
+    const existingStyleRule = document.querySelector("#__dynamic-font-style__");
+    if (existingStyleRule) {
+      existingStyleRule.remove();
+    }
+
+    const dynamicStyle = document.createElement("style");
+    dynamicStyle.id = "__dynamic-font-style__";
+    dynamicStyle.textContent = `
+      .workout,
+      .workout *,
+      .workout .content,
+      .workout .content * {
+        font-size: ${fontSize}rem !important;
+      }
+    `;
+    document.head.appendChild(dynamicStyle);
+  }
 
   // Function to scroll to specific content div
   function scrollToContent(index) {
@@ -98,7 +130,7 @@
   const style = document.createElement("style");
   style.className = "__workout-focus-style__";
   style.textContent = `
-    .content {
+  .content {
 		padding: 0 !important;
 		margin: 0 !important;
 	}
@@ -112,6 +144,8 @@
       background: #fff !important;
       z-index: 999999 !important;
       width: 100vw !important;
+      max-width: 100vw !important;
+      padding-right: 5vw !important;
       height: 100vh !important;
       overflow: auto !important;
       font-size: 8rem !important;
@@ -123,8 +157,16 @@
 	  border: none !important;
 	  font-weight: 800 !important;
     }
+    .workout .content {
+     max-width: 95vw !important;
+}
 	  .workout pre {
-	  line-height: 1.2 !important;}
+	  line-height: 1.2 !important;
+	  white-space: pre-wrap !important;
+	  word-wrap: break-word !important;
+	  overflow-wrap: break-word !important;
+	  max-width: 100% !important;
+	  box-sizing: border-box !important;}
 	.workout-content {
       box-shadow: none !important;
 	  border: none !important;
@@ -152,8 +194,16 @@
       flex-direction: column;
       gap: 8px;
     }
-    .__workout-scroll-up__,
-    .__workout-scroll-down__ {
+    .__workout-zoom-btns__ {
+      position: fixed;
+      bottom: 400px;
+      right: 24px;
+      z-index: 1000000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .__workout-btn__ {
       width: 120px;
       height: 180px;
       font-size: 8rem;
@@ -169,8 +219,7 @@
       justify-content: center;
       transition: all 0.2s ease;
     }
-    .__workout-scroll-up__:hover,
-    .__workout-scroll-down__:hover {
+    .__workout-btn__:hover {
       background: rgba(0, 122, 255, 0.1);
     }
     @media (max-width: 600px) {
@@ -209,10 +258,25 @@
   btn.className = "__workout-focus-btn__";
   btn.innerText = "Exit Focus Mode";
   btn.onclick = () => {
+    // Exit fullscreen
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+
     document.body.classList.remove(FOCUS_CLASS);
     style.remove();
     btn.remove();
     scrollBtns.remove();
+    zoomBtns.remove();
+    // Remove dynamic font style
+    const dynamicFontStyle = document.querySelector("#__dynamic-font-style__");
+    if (dynamicFontStyle) {
+      dynamicFontStyle.remove();
+    }
     document.removeEventListener("keydown", keyHandler);
     document.querySelectorAll("._workout_original_hide").forEach((el) => {
       el.style.display = "";
@@ -221,12 +285,36 @@
   };
   document.body.appendChild(btn);
 
+  // Add zoom buttons
+  const zoomBtns = document.createElement("div");
+  zoomBtns.className = "__workout-zoom-btns__";
+
+  const plusBtn = document.createElement("button");
+  plusBtn.className = "__workout-btn__";
+  plusBtn.innerHTML = "+";
+  plusBtn.onclick = () => {
+    currentFontSize = Math.min(currentFontSize * 1.15, baseFontSize * 4); // Max 4x base size
+    updateFontSize(currentFontSize);
+  };
+
+  const minusBtn = document.createElement("button");
+  minusBtn.className = "__workout-btn__";
+  minusBtn.innerHTML = "-";
+  minusBtn.onclick = () => {
+    currentFontSize = Math.max(currentFontSize * 0.85, baseFontSize * 0.25); // Min 0.25x base size
+    updateFontSize(currentFontSize);
+  };
+
+  zoomBtns.appendChild(plusBtn);
+  zoomBtns.appendChild(minusBtn);
+  document.body.appendChild(zoomBtns);
+
   // Add scroll buttons
   const scrollBtns = document.createElement("div");
   scrollBtns.className = "__workout-scroll-btns__";
 
   const upBtn = document.createElement("button");
-  upBtn.className = "__workout-scroll-up__";
+  upBtn.className = "__workout-btn__";
   upBtn.innerHTML = "↑";
   upBtn.onclick = () => {
     workout.scrollBy({
@@ -236,7 +324,7 @@
   };
 
   const downBtn = document.createElement("button");
-  downBtn.className = "__workout-scroll-down__";
+  downBtn.className = "__workout-btn__";
   downBtn.innerHTML = "↓";
   downBtn.onclick = () => {
     workout.scrollBy({
