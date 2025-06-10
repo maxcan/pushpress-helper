@@ -62,13 +62,34 @@
   //     }
   //   });
 
+  // Get all content divs that are not "coach view only"
+  const contentDivs = Array.from(workout.querySelectorAll(".content")).filter(
+    (contentEl) =>
+      !(contentEl.textContent || "").toLowerCase().includes("coach view only")
+  );
+
+  console.log(`Found ${contentDivs.length} content divs:`, contentDivs);
+
+  let currentIndex = 0;
+
+  // Function to scroll to specific content div
+  function scrollToContent(index) {
+    console.log(`Scrolling to content ${index} of ${contentDivs.length}`);
+    if (contentDivs[index]) {
+      contentDivs[index].scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+      console.log(`Scrolled to div ${index}:`, contentDivs[index]);
+    }
+  }
+
   document.querySelectorAll(".workout .content").forEach((contentEl) => {
     if (
       (contentEl.textContent || "").toLowerCase().includes("coach view only")
     ) {
       contentEl.style.display = "none !important";
       contentEl.style.setProperty("display", "none", "important");
-
       contentEl.classList.add("_workout_original_hide");
     }
   });
@@ -122,6 +143,36 @@
       cursor: pointer;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
+    .__workout-scroll-btns__ {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .__workout-scroll-up__,
+    .__workout-scroll-down__ {
+      width: 120px;
+      height: 180px;
+      font-size: 8rem;
+      font-weight: bold;
+      background: rgba(0, 122, 255, 0.9);
+      color: #fff;
+      border: 4px solid rgb(0,122,255);
+      border-radius: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .__workout-scroll-up__:hover,
+    .__workout-scroll-down__:hover {
+      background: rgba(0, 122, 255, 0.1);
+    }
     @media (max-width: 600px) {
       .workout {
         font-size: 5vw !important;
@@ -136,6 +187,23 @@
   `;
   document.head.appendChild(style);
 
+  // Add keyboard navigation
+  const keyHandler = (e) => {
+    console.log(`🚀 - focus.js:160 - keyHandler - e:`, e.key);
+    if (e.key === "PageDown") {
+      e.preventDefault();
+      currentIndex = (currentIndex + 1) % contentDivs.length;
+      scrollToContent(currentIndex);
+    } else if (e.key === "PageUp") {
+      e.preventDefault();
+      currentIndex =
+        (currentIndex - 1 + contentDivs.length) % contentDivs.length;
+      scrollToContent(currentIndex);
+    }
+  };
+
+  document.addEventListener("keydown", keyHandler);
+
   // Add a toggle button (in case user wants to revert)
   const btn = document.createElement("button");
   btn.className = "__workout-focus-btn__";
@@ -144,10 +212,43 @@
     document.body.classList.remove(FOCUS_CLASS);
     style.remove();
     btn.remove();
+    scrollBtns.remove();
+    document.removeEventListener("keydown", keyHandler);
     document.querySelectorAll("._workout_original_hide").forEach((el) => {
       el.style.display = "";
       el.classList.remove("_workout_original_hide");
     });
   };
   document.body.appendChild(btn);
+
+  // Add scroll buttons
+  const scrollBtns = document.createElement("div");
+  scrollBtns.className = "__workout-scroll-btns__";
+
+  const upBtn = document.createElement("button");
+  upBtn.className = "__workout-scroll-up__";
+  upBtn.innerHTML = "↑";
+  upBtn.onclick = () => {
+    workout.scrollBy({
+      top: -window.innerHeight * 0.25,
+      behavior: "smooth",
+    });
+  };
+
+  const downBtn = document.createElement("button");
+  downBtn.className = "__workout-scroll-down__";
+  downBtn.innerHTML = "↓";
+  downBtn.onclick = () => {
+    workout.scrollBy({
+      top: window.innerHeight * 0.25,
+      behavior: "smooth",
+    });
+  };
+
+  scrollBtns.appendChild(upBtn);
+  scrollBtns.appendChild(downBtn);
+  document.body.appendChild(scrollBtns);
+
+  // Scroll to first content section
+  scrollToContent(0);
 })();
