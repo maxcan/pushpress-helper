@@ -204,9 +204,9 @@
       gap: 8px;
     }
     .__workout-btn__ {
-      width: 120px;
-      height: 180px;
-      font-size: 8rem;
+      width: 6vw;
+      height: 9vw;
+      font-size: 3vw;
       font-weight: bold;
       background: rgba(0, 122, 255, 0.9);
       color: #fff;
