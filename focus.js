@@ -18,14 +18,14 @@
 
   document.body.classList.add(FOCUS_CLASS);
 
-  // Enter fullscreen mode
-  if (document.documentElement.requestFullscreen) {
-    document.documentElement.requestFullscreen();
-  } else if (document.documentElement.webkitRequestFullscreen) {
-    document.documentElement.webkitRequestFullscreen();
-  } else if (document.documentElement.msRequestFullscreen) {
-    document.documentElement.msRequestFullscreen();
-  }
+  // // Enter fullscreen mode
+  // if (document.documentElement.requestFullscreen) {
+  //   document.documentElement.requestFullscreen();
+  // } else if (document.documentElement.webkitRequestFullscreen) {
+  //   document.documentElement.webkitRequestFullscreen();
+  // } else if (document.documentElement.msRequestFullscreen) {
+  //   document.documentElement.msRequestFullscreen();
+  // }
 
   const workout = document.querySelector(".workout");
   if (!workout) {
@@ -39,6 +39,7 @@
     // Hide <fuse-sidebar>, <navbar>, <toolbar>
     if (
       child.tagName.toLowerCase() === "fuse-sidebar" ||
+      child.tagName.toLowerCase() === "footer" ||
       child.tagName.toLowerCase() === "navbar" ||
       child.tagName.toLowerCase() === "toolbar"
     ) {
@@ -53,10 +54,12 @@
   });
 
   // Hide these tags globally (in case they're nested somewhere)
-  document.querySelectorAll("fuse-sidebar, navbar, toolbar").forEach((el) => {
-    el.style.display = "none";
-    el.classList.add("_workout_original_hide");
-  });
+  document
+    .querySelectorAll("fuse-sidebar, footer, navbar, toolbar")
+    .forEach((el) => {
+      el.style.display = "none";
+      el.classList.add("_workout_original_hide");
+    });
 
   //   // HIDE .content SECTIONS THAT SAY "Coach View Only"
   //   document.querySelectorAll(".workout .content").forEach((contentEl) => {
@@ -136,6 +139,17 @@
 	}
 		._workout_original_hide {
 		display: none !important;}
+    .badge { display: none !important; }
+    .workout-title {
+      font-size: 4rem !important;
+      font-weight: bold !important;
+      margin-bottom: 1rem !important;
+    }
+    .workout-subtitle {
+      font-size: 4rem !important;
+      font-weight: bold !important;
+      margin-bottom: 1rem !important;
+    }
     .workout {
       position: fixed !important;
       top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
@@ -259,13 +273,13 @@
   btn.innerText = "Exit Focus Mode";
   btn.onclick = () => {
     // Exit fullscreen
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-      document.msExitFullscreen();
-    }
+    // if (document.exitFullscreen) {
+    //   document.exitFullscreen();
+    // } else if (document.webkitExitFullscreen) {
+    //   document.webkitExitFullscreen();
+    // } else if (document.msExitFullscreen) {
+    //   document.msExitFullscreen();
+    // }
 
     document.body.classList.remove(FOCUS_CLASS);
     style.remove();
