@@ -141,13 +141,15 @@
 		display: none !important;}
     .badge { display: none !important; }
     .workout-title {
-      font-size: 4rem !important;
+      font-size: 3rem !important;
+      opacity: 0.8 !important;
       font-weight: bold !important;
       margin-bottom: 1rem !important;
     }
     .workout-subtitle {
-      font-size: 4rem !important;
-      font-weight: bold !important;
+      font-size: 2rem !important;
+      opacity: 0.8 !important;
+      font-weight: semi-bold !important;
       margin-bottom: 1rem !important;
     }
     .workout {
