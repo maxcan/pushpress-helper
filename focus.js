@@ -1,4 +1,20 @@
 (function () {
+  // Run only once per frame and only on the real page
+  if (window.__WFM_INSTALLED__) {
+    /* already ran in this frame */ throw new Error("dup");
+  }
+  window.__WFM_INSTALLED__ = true;
+
+  const allowedHost = "train.pushpress.com";
+  const isTopFrame = window === top;
+  const isAllowed = location.hostname === allowedHost && isTopFrame;
+
+  if (!isAllowed) {
+    // If you want to allow same-origin subframes, drop the isTopFrame check.
+    // For now, we only act in the top page.
+    console.debug("[WFM] skipping frame:", location.href, "isTop?", isTopFrame);
+    return;
+  }
   const FOCUS_CLASS = "__workout-focus-active__";
 
   if (document.body.classList.contains(FOCUS_CLASS)) {
